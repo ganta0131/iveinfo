@@ -12,15 +12,23 @@ app = Flask(__name__)
 try:
     credentials = os.getenv('GOOGLE_SERVICE_ACCOUNT_INFO')
     if credentials:
-        # 一時ファイルに認証情報を保存
-        with open('/tmp/credentials.json', 'w') as f:
-            f.write(credentials)
-        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/tmp/credentials.json'
-        print("Credentials set successfully")
+        # JSON文字列を辞書に変換
+        try:
+            credentials_dict = json.loads(credentials)
+            # 一時ファイルに認証情報を保存
+            with open('/tmp/credentials.json', 'w') as f:
+                json.dump(credentials_dict, f)
+            os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/tmp/credentials.json'
+            print("Credentials set successfully")
+        except json.JSONDecodeError:
+            print("Invalid JSON format in credentials")
+            raise ValueError("Invalid JSON format in GOOGLE_SERVICE_ACCOUNT_INFO")
     else:
         print("No credentials found in environment variable")
+        raise ValueError("GOOGLE_SERVICE_ACCOUNT_INFO not found")
 except Exception as e:
     print(f"Error setting up credentials: {str(e)}")
+    raise  # エラーを再スローしてアプリケーションの起動を防ぐ
 
 # Gemini APIの設定
 try:
@@ -28,7 +36,7 @@ try:
     print("Gemini API initialized successfully")
 except Exception as e:
     print(f"Error initializing Gemini API: {str(e)}")
-    model = None
+    raise  # エラーを再スローしてアプリケーションの起動を防ぐ
 
 @app.route('/')
 def index():
@@ -37,12 +45,6 @@ def index():
 @app.route('/get_events', methods=['POST'])
 def get_events():
     try:
-        if model is None:
-            return jsonify({
-                'success': False,
-                'error': 'Gemini API initialization failed'
-            }), 500
-
         # プロンプトを読み込む
         with open('プロンプト.txt', 'r', encoding='utf-8') as f:
             prompt = f.read()
