@@ -32,7 +32,7 @@ except Exception as e:
 
 # Gemini APIの設定
 try:
-    model = get_model('models/gemini-pro-flash')
+    model = get_model('models/gemini-pro-vision-flash')
     print("Gemini API initialized successfully")
 except Exception as e:
     print(f"Error initializing Gemini API: {str(e)}")
