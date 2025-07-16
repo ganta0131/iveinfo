@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import os
-from google.generativeai import AIModel, Model
+from google.generativeai import get_model
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -8,7 +8,8 @@ load_dotenv()
 app = Flask(__name__)
 
 # Gemini APIの設定
-model = Model('gemini-1.5-flash', api_key=os.getenv('GOOGLE_SERVICE_ACCOUNT_INFO'))
+model = get_model('gemini-1.5-flash')
+model._api_key = os.getenv('GOOGLE_SERVICE_ACCOUNT_INFO')
 
 @app.route('/')
 def index():
