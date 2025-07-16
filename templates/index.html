@@ -6,44 +6,68 @@
     <title>週末どこいく？</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
+            font-family: 'Yu Gothic', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
             padding: 20px;
             background-color: #f5f5f5;
         }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        
         .container {
-            max-width: 800px;
-            margin: 0 auto;
             background-color: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        h1 {
-            color: #333;
+        
+        .search-container {
             text-align: center;
+            margin: 20px 0;
         }
-        .search-button {
-            display: block;
-            width: 100%;
-            padding: 15px;
+        
+        #searchButton {
+            padding: 10px 20px;
+            font-size: 16px;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
-            font-size: 18px;
             cursor: pointer;
-            margin: 20px 0;
+            transition: background-color 0.3s;
         }
-        .search-button:hover {
+        
+        #searchButton:hover {
             background-color: #45a049;
         }
-        #events {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 5px;
-            background-color: #f8f9fa;
+        
+        #searchButton:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
         }
+        
+        .events {
+            margin-top: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .events-container {
+            margin-top: 20px;
+        }
+        
+        .events-container p {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+        
         .loading {
             text-align: center;
             color: #666;

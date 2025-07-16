@@ -37,9 +37,16 @@ def get_events():
         response = model.generate_content(prompt)
         events_info = response.text
         
+        # テキストをHTMLの段落に変換
+        paragraphs = events_info.split('\n')
+        formatted_html = '<div class="events-container">'
+        for para in paragraphs:
+            formatted_html += f'<p>{para}</p>'
+        formatted_html += '</div>'
+        
         return jsonify({
             'success': True,
-            'events': events_info
+            'events': formatted_html
         })
     except Exception as e:
         return jsonify({
