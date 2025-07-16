@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 # Gemini APIの設定
 try:
-    model = get_model('gemini-1.5-flash')
+    model = get_model('models/gemini-1.5-flash')
     model._api_key = os.getenv('GOOGLE_SERVICE_ACCOUNT_INFO')
     print("Gemini API initialized successfully")
 except Exception as e:
@@ -46,10 +46,6 @@ def get_events():
             'success': False,
             'error': str(e)
         }), 500
-
-@app.route('/')
-def index():
-    return render_template('index.html')
 
 @app.route('/get_events', methods=['POST'])
 def get_events():
