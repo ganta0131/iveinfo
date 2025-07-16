@@ -32,10 +32,23 @@ except Exception as e:
 
 # Gemini APIの設定
 try:
-    model = Model('models/gemini-pro-vision-flash')
-    print("Gemini API initialized successfully")
+    # モデルの初期化前にAPIクライアントを設定
+    from google.ai.generativelanguage_v1beta import GenerativeLanguageClient
+    client = GenerativeLanguageClient()
+    
+    # モデルのリストを取得して確認
+    models = client.list_models()
+    print(f"Available models: {models}")
+    
+    # 指定のモデルが存在するか確認
+    model_id = 'models/gemini-pro-vision-flash'
+    model = client.get_model(name=model_id)
+    print(f"Model {model_id} found and initialized successfully")
+    
 except Exception as e:
     print(f"Error initializing Gemini API: {str(e)}")
+    import traceback
+    print(f"Full traceback: {traceback.format_exc()}")
     raise  # エラーを再スローしてアプリケーションの起動を防ぐ
 
 @app.route('/')
