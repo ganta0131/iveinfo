@@ -79,7 +79,7 @@ def get_meal_plan():
 
         # レシピと買い物リストをHTML形式に変換
         paragraphs = meal_plan.split('\n')
-        recipes_html = ''
+        recipes_html = '<div class="recipes">'
         shopping_list_html = ''
         
         is_shopping_list = False
@@ -109,10 +109,8 @@ def get_meal_plan():
             if is_shopping_list:
                 if not shopping_list_html:
                     shopping_list_html = '<div class="shopping-list">'
-                shopping_list_html += f'<p>{para.strip()}</p>'
+                shopping_list_html += f'<div class="shopping-item">{para.strip()}</div>'
             else:
-                if not recipes_html:
-                    recipes_html = '<div class="recipes">'
                 recipes_html += f'<div class="recipe-item">{para.strip()}</div>'
         
         if current_day:
