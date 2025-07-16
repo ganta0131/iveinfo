@@ -443,6 +443,7 @@
             const paragraphs = recipesText.split('\n');
             let html = '';
             let currentDay = null;
+            let currentType = null;
             
             paragraphs.forEach(para => {
                 const trimmed = para.trim();
@@ -457,26 +458,48 @@
                     html += `<div class="recipe-day">`;
                     html += `<h3>${trimmed}</h3>`;
                     currentDay = trimmed;
-                } else if (trimmed.startsWith('- 主菜：') || trimmed.startsWith('- 副菜：')) {
+                    currentType = null;
+                    return;
+                }
+                
+                // レシピタイプの検出
+                if (trimmed.startsWith('- 主菜：') || trimmed.startsWith('- 副菜：')) {
+                    if (currentType) {
+                        html += '</div>';
+                    }
                     const type = trimmed.startsWith('- 主菜：') ? '主菜' : '副菜';
                     html += `<div class="recipe-type">`;
                     html += `<h4>${type}</h4>`;
+                    currentType = type;
+                    return;
+                }
+                
+                // 材料・作り方の検出
+                if (trimmed.startsWith('材料：') || trimmed.startsWith('作り方：')) {
+                    html += `<div class="recipe-section">`;
+                    html += `<h5>${trimmed}</h5>`;
                     html += `<ul>`;
-                    html += `<li>${trimmed.replace(/^- (主菜|副菜)：/, '')}</li>`;
-                    html += `</ul>`;
-                } else if (trimmed.startsWith('材料：') || trimmed.startsWith('作り方：')) {
-                    html += `<h4>${trimmed}</h4>`;
-                    html += `<ul>`;
-                } else if (trimmed.startsWith('- ')) {
+                    return;
+                }
+                
+                // リスト項目の検出
+                if (trimmed.startsWith('- ')) {
                     html += `<li>${trimmed.replace(/^- /, '')}</li>`;
-                } else if (trimmed.startsWith('最後に、同じ食材を合算して買い物リストを作成してください：')) {
+                    return;
+                }
+                
+                // 買い物リストの開始
+                if (trimmed.startsWith('最後に、同じ食材を合算して買い物リストを作成してください：')) {
                     if (currentDay) {
                         html += '</div>';
                     }
-                    return false; // 買い物リストの開始でループを終了
+                    return false;
                 }
             });
             
+            if (currentType) {
+                html += '</div>';
+            }
             if (currentDay) {
                 html += '</div>';
             }
