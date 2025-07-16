@@ -13,80 +13,6 @@
             background-color: #f5f5f5;
         }
         
-        .loading {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1000;
-            background-color: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border-radius: 5px;
-        }
-        
-        .spinner-border {
-            border: 3px solid white;
-            border-right-color: transparent;
-            width: 2rem;
-            height: 2rem;
-            margin: 0 auto;
-            animation: spin 1s linear infinite;
-        }
-        
-        .loading-text {
-            font-size: 16px;
-            color: white;
-            margin-top: 10px;
-        }
-        
-        /* レシピ表示のスタイル */
-        .recipe-container {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: white;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .recipe-day {
-            margin-bottom: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-        }
-        
-        .recipe-item {
-            margin: 10px 0;
-            padding: 10px;
-            background-color: white;
-            border-radius: 3px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-        }
-        
-        .shopping-list {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: white;
-            border-radius: 5px;
-        }
-        
-        .shopping-item {
-            margin: 10px 0;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .shopping-item:last-child {
-            border-bottom: none;
-        }
-        
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-        
         .container {
             background-color: white;
             padding: 20px;
@@ -94,6 +20,12 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             max-width: 800px;
             margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
         }
         
         .form-group {
@@ -106,20 +38,22 @@
             font-weight: bold;
         }
         
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
         .slider-group {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            margin-top: 10px;
+            gap: 15px;
         }
         
         .slider-item {
             width: 100%;
-        }
-        
-        .slider-container {
-            position: relative;
-            margin: 10px 0;
         }
         
         .slider {
@@ -160,153 +94,80 @@
         }
         
         .slider-value {
-            display: block;
             text-align: center;
             font-weight: bold;
             margin-top: 10px;
             color: #4CAF50;
         }
         
-        .slider-container {
-            margin: 15px 0;
-        }
-        
-        .slider {
+        .search-button {
             width: 100%;
-            margin: 10px 0;
+            padding: 15px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
         
-        .slider-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
+        .search-button:hover {
+            background-color: #45a049;
+        }
+        
+        .search-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .recipes {
+            margin-bottom: 30px;
+        }
+        
+        .recipe-day {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .recipe-item {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: white;
+            border-radius: 3px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        .shopping-list {
+            padding: 15px;
+            background-color: white;
+            border-radius: 5px;
+        }
+        
+        .shopping-item {
+            margin: 10px 0;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .shopping-item:last-child {
+            border-bottom: none;
         }
         
         .error {
             color: red;
             font-size: 14px;
             margin-top: 5px;
-        }
-        
-        .search-button {
-            padding: 20px 40px;
-            font-size: 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            min-width: 300px;
-            margin: 20px auto;
-            display: block;
-        }
-        
-        #searchButton:hover {
-            background-color: #45a049;
-        }
-        
-        #searchButton:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        
-        .recipe-container {
-            margin-top: 30px;
-            display: none;
-        }
-        
-        .recipe-day {
-            margin: 20px 0;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        
-        .recipe-day h3 {
-            color: #333;
-            margin: 0 0 15px 0;
-            border-bottom: 2px solid #4CAF50;
-            padding-bottom: 5px;
-        }
-        
-        .recipe-day .recipe-type {
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-        
-        .recipe-day .recipe-type h4 {
-            margin: 0 0 5px 0;
-            color: #4CAF50;
-        }
-        
-        .recipe-day .recipe-type ul {
-            list-style: none;
-            padding: 0;
-            margin: 5px 0;
-        }
-        
-        .recipe-day .recipe-type li {
-            margin: 5px 0;
-            padding: 5px;
-            background-color: #fff;
-            border-radius: 3px;
-            border: 1px solid #e0e0e0;
-        }
-        
-        .recipe-item ul {
-            list-style: none;
-            padding: 0;
-            margin: 10px 0;
-        }
-        
-        .recipe-item li {
-            margin: 5px 0;
-            padding: 5px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-        
-        .shopping-list {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        
-        .shopping-list h3 {
-            color: #333;
-            margin: 0 0 15px 0;
-            border-bottom: 2px solid #4CAF50;
-            padding-bottom: 5px;
-        }
-        
-        .shopping-list ul {
-            list-style: none;
-            padding: 0;
-            margin: 10px 0;
-        }
-        
-        .shopping-list li {
-            margin: 5px 0;
-            padding: 5px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-        }
-        
-        .error {
-            color: #dc3545;
-            font-size: 14px;
-            margin-top: 5px;
-            padding: 10px;
-            background-color: #fff3f3;
-            border-radius: 4px;
         }
     </style>
 </head>
@@ -315,52 +176,48 @@
         <h1>節約献立プランナー</h1>
         <form id="mealPlanForm">
             <div class="form-group">
-                <label for="people">家族の人数</label>
-                <input type="number" id="people" name="people" min="1" value="1" required>
+                <label for="people">人数</label>
+                <input type="number" id="people" name="people" min="1" value="2" required>
             </div>
             
             <div class="form-group">
-                <label for="days">提案する献立日数（1〜7日）</label>
+                <label for="days">献立日数（1〜7日）</label>
                 <input type="number" id="days" name="days" min="1" max="7" value="7" required>
             </div>
             
             <div class="form-group">
-                <h3>料理の種類</h3>
+                <label>和食・洋食・中華の希望日数</label>
                 <div class="slider-group">
                     <div class="slider-item">
                         <label for="japanese">和食</label>
                         <div class="slider-container">
-                            <input type="range" id="japanese" name="japanese" min="0" max="7" value="0" class="slider">
-                            <span id="japanese-value" class="slider-value">0</span>
+                            <input type="range" id="japanese" name="japanese" min="0" max="7" value="3" class="slider">
+                            <span id="japaneseValue" class="slider-value">3</span>
                         </div>
                     </div>
                     <div class="slider-item">
                         <label for="western">洋食</label>
                         <div class="slider-container">
-                            <input type="range" id="western" name="western" min="0" max="7" value="0" class="slider">
-                            <span id="western-value" class="slider-value">0</span>
+                            <input type="range" id="western" name="western" min="0" max="7" value="2" class="slider">
+                            <span id="westernValue" class="slider-value">2</span>
                         </div>
                     </div>
                     <div class="slider-item">
                         <label for="chinese">中華</label>
                         <div class="slider-container">
-                            <input type="range" id="chinese" name="chinese" min="0" max="7" value="0" class="slider">
-                            <span id="chinese-value" class="slider-value">0</span>
+                            <input type="range" id="chinese" name="chinese" min="0" max="7" value="2" class="slider">
+                            <span id="chineseValue" class="slider-value">2</span>
                         </div>
                     </div>
                 </div>
-                <div class="error" id="typeError"></div>
             </div>
             
-            <button type="submit" class="search-button" id="searchButton">レシピを提案</button>
+            <div class="form-group">
+                <button type="submit" id="searchButton" class="search-button">レシピを提案</button>
+            </div>
         </form>
-        
-        <div id="overlay" class="overlay"></div>
-        <div id="loading" class="loading-container" style="display: none;">
-            <div class="spinner-border" role="status"></div>
-            <div class="loading-text">生成中...</div>
-        </div>
-        <div id="results" class="recipe-container">
+
+        <div id="resultContainer" class="result-container" style="display: none;">
             <div id="recipes"></div>
             <div id="shoppingList"></div>
         </div>
@@ -371,73 +228,35 @@
         document.querySelectorAll('.slider').forEach(slider => {
             slider.addEventListener('input', function() {
                 const value = this.value;
-                const valueSpan = this.closest('.slider-container').querySelector('.slider-value');
-                valueSpan.textContent = value;
-                
-                // 和洋中の合計チェック
-                const days = parseInt(document.getElementById('days').value);
-                const japanese = parseInt(document.getElementById('japanese').value);
-                const western = parseInt(document.getElementById('western').value);
-                const chinese = parseInt(document.getElementById('chinese').value);
-                
-                const errorDiv = document.getElementById('typeError');
-                if (japanese + western + chinese > days) {
-                    errorDiv.textContent = '和洋中の合計が献立日数を超過しています';
-                    errorDiv.style.display = 'block';
-                } else {
-                    errorDiv.style.display = 'none';
-                }
+                const valueElement = document.getElementById(this.id + 'Value');
+                valueElement.textContent = value;
             });
         });
 
-        document.getElementById('days').addEventListener('change', function() {
-            const max = this.value;
-            document.querySelectorAll('.slider').forEach(slider => {
-                slider.max = max;
-            });
-        });
-
+        // フォームの送信処理
         document.getElementById('mealPlanForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            // バリデーション
-            const days = parseInt(document.getElementById('days').value);
-            const japanese = parseInt(document.getElementById('japanese').value);
-            const western = parseInt(document.getElementById('western').value);
-            const chinese = parseInt(document.getElementById('chinese').value);
-            
-            // 数値チェック
-            const people = parseInt(document.getElementById('people').value);
-            if (isNaN(people) || people < 1) {
-                showError('人数は1以上を指定してください');
-                return;
-            }
-            
-            if (isNaN(days) || days < 1 || days > 7) {
-                showError('献立日数は1〜7の間で指定してください');
-                return;
-            }
-            
-            if (japanese + western + chinese !== days) {
-                showError('和洋中の合計が献立日数と一致しません');
-                return;
-            }
-            
-            // フォームデータの収集
-            const formData = {
-                people: people,
-                days: days,
-                japanese: japanese,
-                western: western,
-                chinese: chinese
-            };
-            
-            // ローディング表示
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('recipes').innerHTML = '';
-            document.getElementById('shoppingList').innerHTML = '';
-            
+            const form = e.target;
+            const resultContainer = document.getElementById('resultContainer');
+            const recipes = document.getElementById('recipes');
+            const shoppingList = document.getElementById('shoppingList');
+
             try {
+                // バリデーション
+                const days = parseInt(form.days.value);
+                const japanese = parseInt(form.japanese.value);
+                const western = parseInt(form.western.value);
+                const chinese = parseInt(form.chinese.value);
+
+                if (japanese + western + chinese !== days) {
+                    showError('和食・洋食・中華の合計日数が指定された日数と一致しません');
+                    return;
+                }
+
+                // ローディング表示
+                resultContainer.style.display = 'none';
+
+                // API呼び出し
                 const response = await fetch('/get_meal_plan', {
                     method: 'POST',
                     headers: {
