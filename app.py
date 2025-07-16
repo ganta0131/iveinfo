@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import os
 import json
-from google.generativeai import get_model
+from google.generativeai import get_model, Model
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -32,7 +32,7 @@ except Exception as e:
 
 # Gemini APIの設定
 try:
-    model = get_model('models/gemini-pro-vision-flash')
+    model = Model('models/gemini-pro-vision-flash')
     print("Gemini API initialized successfully")
 except Exception as e:
     print(f"Error initializing Gemini API: {str(e)}")
