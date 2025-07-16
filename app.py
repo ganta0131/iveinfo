@@ -24,7 +24,7 @@ except Exception as e:
 
 # Gemini APIの設定
 try:
-    model = get_model('models/gemini-1.5-flash')
+    model = get_model('gemini-pro-flash')
     print("Gemini API initialized successfully")
 except Exception as e:
     print(f"Error initializing Gemini API: {str(e)}")
@@ -48,7 +48,7 @@ def get_events():
             prompt = f.read()
             
         # AIによるイベント情報生成
-        response = model.generate_content(prompt)
+        response = model.generate(prompt)
         events_info = response.text
         
         return jsonify({
