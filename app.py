@@ -22,7 +22,6 @@ try:
 except Exception as e:
     print(f"Error initializing Gemini API: {str(e)}")
     print(f"Full traceback: {traceback.format_exc()}")
-    raise  # エラーを再スローしてアプリケーションを停止させる
 
 @app.route('/')
 def index():
@@ -78,9 +77,6 @@ def get_meal_plan():
         try:
             response = model.generate_content(prompt)
             meal_plan = response.text
-            print("=== Gemini API Response ===")
-            print(meal_plan)
-            print("=== End of Response ===")
             
             # レシピと買い物リストをHTML形式に変換
             paragraphs = meal_plan.split('\n')
@@ -131,8 +127,6 @@ def get_meal_plan():
                 'shoppingList': shopping_list_html
             })
         except Exception as e:
-            print(f"Error in get_meal_plan: {str(e)}")
-            print(f"Full traceback: {traceback.format_exc()}")
             return jsonify({
                 'success': False,
                 'error': str(e)
