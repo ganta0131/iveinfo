@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>週末どこいく？</title>
+    <title>節約献立プランナー</title>
     <style>
         body {
             font-family: 'Yu Gothic', sans-serif;
@@ -11,6 +11,17 @@
             margin: 0 auto;
             padding: 20px;
             background-color: #f5f5f5;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            color: #666;
+        }
+        
+        .spinner-border {
+            border: 3px solid currentColor;
+            border-right-color: transparent;
         }
         
         h1 {
@@ -28,16 +39,49 @@
             margin: 0 auto;
         }
         
-        .search-container {
-            text-align: center;
-            margin: 20px 0;
+        .form-group {
+            margin-bottom: 20px;
         }
         
-        .description {
-            text-align: center;
-            margin: 20px 0;
-            font-size: 18px;
-            color: #666;
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        input[type="number"] {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .slider-container {
+            margin: 15px 0;
+        }
+        
+        .slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
         }
         
         .search-button {
@@ -50,7 +94,7 @@
             cursor: pointer;
             transition: background-color 0.3s;
             min-width: 300px;
-            margin: 0 auto;
+            margin: 20px auto;
             display: block;
         }
         
@@ -63,76 +107,202 @@
             cursor: not-allowed;
         }
         
-        .events {
-            margin-top: 20px;
-            font-size: 14px;
-            line-height: 1.6;
+        .recipe-container {
+            margin-top: 30px;
+            display: none;
         }
         
-        .events-container {
-            margin-top: 20px;
+        .recipe-item {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         
-        .events-container p {
+        .recipe-item h3 {
+            color: #333;
+            margin: 0 0 15px 0;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+        }
+        
+        .recipe-item ul {
+            list-style: none;
+            padding: 0;
             margin: 10px 0;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-            border-left: 4px solid #4CAF50;
-            word-wrap: break-word;
-            word-break: break-all;
-            white-space: pre-wrap;
-            font-size: 14px;
-            line-height: 1.6;
-            max-width: 600px;
-            margin: 0 auto;
         }
         
-        .loading {
-            text-align: center;
-            color: #666;
+        .recipe-item li {
+            margin: 5px 0;
+            padding: 5px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .shopping-list {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .shopping-list h3 {
+            color: #333;
+            margin: 0 0 15px 0;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 5px;
+        }
+        
+        .shopping-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+        
+        .shopping-list li {
+            margin: 5px 0;
+            padding: 5px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            padding: 10px;
+            background-color: #fff3f3;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>週末どこいく？</h1>
-        <p class="description">たけるの家の近くのイベントを調べてみよう！</p>
-        <button class="search-button" onclick="searchEvents()">イベントを調べる</button>
-        <div id="events">
-            <div id="loading" class="loading" style="display: none;">イベント情報を検索中...</div>
-            <div id="events-content"></div>
+        <h1>節約献立プランナー</h1>
+        <form id="mealPlanForm">
+            <div class="form-group">
+                <label for="people">人数</label>
+                <input type="number" id="people" name="people" min="1" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="days">献立日数（1〜7日）</label>
+                <input type="number" id="days" name="days" min="1" max="7" required>
+            </div>
+            
+            <div class="form-group">
+                <h3>料理の種類</h3>
+                <div class="input-group">
+                    <div>
+                        <label for="japanese">和食</label>
+                        <input type="number" id="japanese" name="japanese" min="0" required>
+                    </div>
+                    <div>
+                        <label for="western">洋食</label>
+                        <input type="number" id="western" name="western" min="0" required>
+                    </div>
+                    <div>
+                        <label for="chinese">中華</label>
+                        <input type="number" id="chinese" name="chinese" min="0" required>
+                    </div>
+                </div>
+                <div class="error" id="typeError"></div>
+            </div>
+            
+            <button type="submit" class="search-button" id="searchButton">レシピを提案</button>
+        </form>
+        
+        <div id="results" class="recipe-container">
+            <div id="loading" class="loading" style="display: none; text-align: center;">
+                <div style="display: inline-block;">
+                    <div class="spinner-border text-primary" role="status" style="width: 2rem; height: 2rem; margin-bottom: 10px;">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <p>レシピを生成中...</p>
+                </div>
+            </div>
+            <div id="recipes"></div>
+            <div id="shoppingList"></div>
         </div>
     </div>
 
     <script>
-        async function searchEvents() {
-            const loading = document.getElementById('loading');
-            const eventsContent = document.getElementById('events-content');
+        document.getElementById('mealPlanForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            loading.style.display = 'block';
-            eventsContent.innerHTML = '';
+            // バリデーション
+            const days = parseInt(document.getElementById('days').value);
+            const japanese = parseInt(document.getElementById('japanese').value);
+            const western = parseInt(document.getElementById('western').value);
+            const chinese = parseInt(document.getElementById('chinese').value);
+            
+            // 数値チェック
+            const people = parseInt(document.getElementById('people').value);
+            if (isNaN(people) || people < 1) {
+                showError('人数は1以上を指定してください');
+                return;
+            }
+            
+            if (isNaN(days) || days < 1 || days > 7) {
+                showError('献立日数は1〜7の間で指定してください');
+                return;
+            }
+            
+            if (japanese + western + chinese !== days) {
+                showError('和洋中の合計が献立日数と一致しません');
+                return;
+            }
+            
+            // フォームデータの収集
+            const formData = {
+                people: people,
+                days: days,
+                japanese: japanese,
+                western: western,
+                chinese: chinese
+            };
+            
+            // ローディング表示
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('recipes').innerHTML = '';
+            document.getElementById('shoppingList').innerHTML = '';
             
             try {
-                const response = await fetch('/get_events', {
+                const response = await fetch('/get_meal_plan', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                    }
+                    },
+                    body: JSON.stringify(formData)
                 });
                 
                 const data = await response.json();
                 
                 if (data.success) {
-                    eventsContent.innerHTML = `<pre>${data.events}</pre>`;
+                    document.getElementById('results').style.display = 'block';
+                    document.getElementById('recipes').innerHTML = data.recipes;
+                    document.getElementById('shoppingList').innerHTML = data.shoppingList;
                 } else {
-                    eventsContent.innerHTML = `<p>エラーが発生しました: ${data.error}</p>`;
+                    throw new Error(data.error);
                 }
             } catch (error) {
-                eventsContent.innerHTML = `<p>エラーが発生しました: ${error.message}</p>`;
+                showError(`エラーが発生しました: ${error.message}`);
             } finally {
-                loading.style.display = 'none';
+                document.getElementById('loading').style.display = 'none';
             }
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('typeError');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
         }
     </script>
 </body>

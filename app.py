@@ -26,27 +26,82 @@ except Exception as e:
 def index():
     return render_template('index.html')
 
-@app.route('/get_events', methods=['POST'])
-def get_events():
+@app.route('/get_meal_plan', methods=['POST'])
+def get_meal_plan():
     try:
-        # プロンプトを読み込む
-        with open('プロンプト.txt', 'r', encoding='utf-8') as f:
-            prompt = f.read()
-            
-        # AIによるイベント情報生成
+        data = request.get_json()
+        people = data.get('people', 1)
+        days = data.get('days', 7)
+        japanese = data.get('japanese', 0)
+        western = data.get('western', 0)
+        chinese = data.get('chinese', 0)
+
+        # プロンプトの作成
+        prompt = f"""以下の条件に基づいて、1週間分の夕食レシピ（主菜＋副菜）を生成してください。
+
+条件：
+- 人数：{people}人
+- 献立日数：{days}日
+- 和食：{japanese}日
+- 洋食：{western}日
+- 中華：{chinese}日
+- 1日あたりの材料費は300円以内
+- 使用食材は週内で共通化（少なめに）
+- 分量は人数に応じて自動調整
+- 作り方は簡潔・一般向け
+
+各日のレシピは以下の形式で出力してください：
+1. 日付（例：1日目）
+   - 主菜：レシピ名
+     材料：
+     - 材料1：分量
+     - 材料2：分量
+     作り方：
+     1. 手順1
+     2. 手順2
+   - 副菜：レシピ名
+     材料：
+     - 材料1：分量
+     - 材料2：分量
+     作り方：
+     1. 手順1
+     2. 手順2
+
+最後に、同じ食材を合算して買い物リストを作成してください：
+- 材料名：合算分量
+- 材料名：合算分量
+"""
+
+        # AIによるレシピ生成
         response = model.generate_content(prompt)
-        events_info = response.text
+        meal_plan = response.text
+
+        # レシピと買い物リストをHTML形式に変換
+        paragraphs = meal_plan.split('\n')
+        recipes_html = '<div class="recipes">'
+        shopping_list_html = '<div class="shopping-list">'
         
-        # テキストをHTMLの段落に変換
-        paragraphs = events_info.split('\n')
-        formatted_html = '<div class="events-container">'
+        is_shopping_list = False
         for para in paragraphs:
-            formatted_html += f'<p>{para}</p>'
-        formatted_html += '</div>'
+            if para.strip() == '最後に、同じ食材を合算して買い物リストを作成してください：':
+                is_shopping_list = True
+                continue
+            
+            if not para.strip():
+                continue
+            
+            if is_shopping_list:
+                shopping_list_html += f'<p>{para}</p>'
+            else:
+                recipes_html += f'<div class="recipe-item">{para}</div>'
+        
+        recipes_html += '</div>'
+        shopping_list_html += '</div>'
         
         return jsonify({
             'success': True,
-            'events': formatted_html
+            'recipes': recipes_html,
+            'shoppingList': shopping_list_html
         })
     except Exception as e:
         return jsonify({
