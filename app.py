@@ -34,7 +34,7 @@ def get_events():
             prompt = f.read()
             
         # AIによるイベント情報生成
-        response = model.generate(prompt)
+        response = model.generate_content(prompt)
         events_info = response.text
         
         return jsonify({
