@@ -15,7 +15,7 @@ if not os.getenv('GOOGLE_SERVICE_ACCOUNT_INFO'):
 
 # Gemini APIの設定
 try:
-    model = get_model('gemini-pro-flash')
+    model = get_model('gemini-1.5-flash')
     print("Gemini API initialized successfully")
 except Exception as e:
     print(f"Error initializing Gemini API: {str(e)}")
