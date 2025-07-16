@@ -82,18 +82,36 @@ def get_meal_plan():
         shopping_list_html = '<div class="shopping-list">'
         
         is_shopping_list = False
+        current_day = None
+        
         for para in paragraphs:
-            if para.strip() == '最後に、同じ食材を合算して買い物リストを作成してください：':
-                is_shopping_list = True
-                continue
-            
             if not para.strip():
                 continue
-            
+                
+            # 日付の検出
+            day_match = re.match(r'^(\d+)日目$', para.strip())
+            if day_match:
+                if current_day:
+                    recipes_html += '</div>'
+                current_day = day_match.group(1)
+                recipes_html += f'<div class="recipe-day">'
+                recipes_html += f'<h3>{para.strip()}</h3>'
+                continue
+                
+            # 買い物リストの開始
+            if para.strip() == '最後に、同じ食材を合算して買い物リストを作成してください：':
+                if current_day:
+                    recipes_html += '</div>'
+                is_shopping_list = True
+                continue
+                
             if is_shopping_list:
-                shopping_list_html += f'<p>{para}</p>'
+                shopping_list_html += f'<p>{para.strip()}</p>'
             else:
-                recipes_html += f'<div class="recipe-item">{para}</div>'
+                recipes_html += f'<div class="recipe-item">{para.strip()}</div>'
+        
+        if current_day:
+            recipes_html += '</div>'
         
         recipes_html += '</div>'
         shopping_list_html += '</div>'

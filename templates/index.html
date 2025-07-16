@@ -44,6 +44,7 @@
             border-right-color: transparent;
             width: 3rem;
             height: 3rem;
+            margin: 0 auto;
         }
         
         h1 {
@@ -73,13 +74,13 @@
         
         .slider-group {
             display: flex;
+            flex-direction: column;
             gap: 20px;
             margin-top: 10px;
         }
         
         .slider-item {
-            flex: 1;
-            min-width: 200px;
+            width: 100%;
         }
         
         .slider-container {
@@ -322,9 +323,7 @@
         
         <div id="overlay" class="overlay"></div>
         <div id="loading" class="loading-container" style="display: none;">
-            <div class="spinner-border" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
+            <div class="spinner-border" role="status"></div>
             <div class="loading-text">生成中...</div>
         </div>
         <div id="results" class="recipe-container">
