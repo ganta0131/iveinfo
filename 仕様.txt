@@ -1,0 +1,10 @@
+webアプリを作りたい。
+タイトルは「週末どこいく？」。「イベントを調べる」ボタンを押すと、AIがイベント情報を出してくる。
+プロンプトは「プロンプト.txt」の内容で。
+
+generate apiで結果文章生成。github経由でvercelで公開。
+webアプリなのでindex.htmlとpyファイルで作って。
+
+githubとvercelは接続完了。gitのブランチはmain。
+githubのフォルダはまだありません。https://github.com/ganta0131/iveinfoフォルダを作ってください。
+apiキーはサービスアカウント情報をvercel環境変数GOOGLE_SERVICE_ACCOUNT_INFOで設定済み。geminiは1.5flashを必ず使用すること
