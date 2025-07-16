@@ -13,15 +13,37 @@
             background-color: #f5f5f5;
         }
         
-        .loading {
+        .overlay {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .loading-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             text-align: center;
-            color: #666;
+            z-index: 1001;
+        }
+        
+        .loading-text {
+            font-size: 24px;
+            color: white;
+            margin-top: 20px;
         }
         
         .spinner-border {
-            border: 3px solid currentColor;
+            border: 3px solid white;
             border-right-color: transparent;
+            width: 3rem;
+            height: 3rem;
         }
         
         h1 {
@@ -68,14 +90,28 @@
         .slider {
             width: 100%;
             height: 4px;
+            appearance: none;
             -webkit-appearance: none;
+            -moz-appearance: none;
             background: #ddd;
             border-radius: 2px;
             outline: none;
         }
         
         .slider::-webkit-slider-thumb {
+            appearance: none;
             -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #4CAF50;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .slider::-moz-range-thumb {
+            appearance: none;
             width: 20px;
             height: 20px;
             background: #4CAF50;
@@ -284,15 +320,14 @@
             <button type="submit" class="search-button" id="searchButton">レシピを提案</button>
         </form>
         
-        <div id="results" class="recipe-container">
-            <div id="loading" class="loading" style="display: none; text-align: center;">
-                <div style="display: inline-block;">
-                    <div class="spinner-border text-primary" role="status" style="width: 2rem; height: 2rem; margin-bottom: 10px;">
-                        <span class="sr-only">Loading...</span>
-                    </div>
-                    <p>レシピを生成中...</p>
-                </div>
+        <div id="overlay" class="overlay"></div>
+        <div id="loading" class="loading-container" style="display: none;">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
             </div>
+            <div class="loading-text">生成中...</div>
+        </div>
+        <div id="results" class="recipe-container">
             <div id="recipes"></div>
             <div id="shoppingList"></div>
         </div>
@@ -365,6 +400,7 @@
             };
             
             // ローディング表示
+            document.getElementById('overlay').style.display = 'block';
             document.getElementById('loading').style.display = 'block';
             document.getElementById('recipes').innerHTML = '';
             document.getElementById('shoppingList').innerHTML = '';
@@ -390,6 +426,7 @@
             } catch (error) {
                 showError(`エラーが発生しました: ${error.message}`);
             } finally {
+                document.getElementById('overlay').style.display = 'none';
                 document.getElementById('loading').style.display = 'none';
             }
         });
