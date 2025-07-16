@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import os
 import traceback
-from google.generativeai import get_model
+import google.generativeai as genai
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -15,11 +15,12 @@ if not os.getenv('GOOGLE_SERVICE_ACCOUNT_INFO'):
 
 # Gemini APIの設定
 try:
-    model = get_model('gemini-1.5-flash')
+    genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
+    model = genai.GenerativeModel('gemini-1.5-flash')
     print("Gemini API initialized successfully")
 except Exception as e:
     print(f"Error initializing Gemini API: {str(e)}")
-    raise
+    print(f"Full traceback: {traceback.format_exc()}")
 
 @app.route('/')
 def index():
