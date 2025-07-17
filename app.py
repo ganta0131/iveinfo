@@ -91,6 +91,7 @@ def get_meal_plan():
                 is_shopping_list = False
                 current_day = None
                 current_recipe = None
+                current_section = None
                 
                 for para in paragraphs:
                     if not para.strip():
@@ -111,6 +112,22 @@ def get_meal_plan():
                         is_shopping_list = True
                         continue
                     
+                    # レシピタイプの検出
+                    if para.strip().startswith('- 主菜：') or para.strip().startswith('- 副菜：'):
+                        if current_recipe:
+                            recipes_html += '</div>'
+                        current_recipe = para.strip()
+                        recipes_html += f'<div class="recipe-item">{para.strip()}</div>'
+                        current_section = None
+                        continue
+                    
+                    # セクションの検出
+                    if para.strip().startswith('材料：') or para.strip().startswith('作り方：'):
+                        current_section = para.strip()
+                        recipes_html += f'<div class="recipe-section">'
+                        recipes_html += f'<h4>{para.strip()}</h4>'
+                        continue
+                    
                     if is_shopping_list:
                         # 買い物リストの項目を処理
                         if para.strip().startswith('- '):
@@ -119,14 +136,17 @@ def get_meal_plan():
                                 shopping_list_html += f'<div class="shopping-item">{item}</div>'
                     else:
                         # レシピの項目を処理
-                        if para.strip().startswith('- 主菜：') or para.strip().startswith('- 副菜：'):
-                            if current_recipe:
-                                recipes_html += '</div>'
-                            current_recipe = para.strip()
-                            recipes_html += f'<div class="recipe-item">{para.strip()}</div>'
-                        else:
-                            # 材料や作り方の項目を処理
-                            if current_recipe:
+                        if current_recipe:
+                            if current_section:
+                                # 材料や作り方の項目を処理
+                                if para.strip().startswith('- '):
+                                    item = para.strip().replace('-', '').strip()
+                                    if item:
+                                        recipes_html += f'<div class="recipe-content">{item}</div>'
+                                else:
+                                    recipes_html += f'<div class="recipe-content">{para.strip()}</div>'
+                            else:
+                                # レシピ名の下の説明を処理
                                 recipes_html += f'<div class="recipe-content">{para.strip()}</div>'
                 
                 if current_recipe:
