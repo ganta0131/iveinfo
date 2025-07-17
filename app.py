@@ -86,7 +86,7 @@ def get_meal_plan():
             try:
                 paragraphs = meal_plan.split('\n')
                 recipes_html = '<div class="recipes">'
-                shopping_list_html = ''
+                shopping_list_html = '<div class="shopping-list">'
                 
                 is_shopping_list = False
                 current_day = None
@@ -106,29 +106,28 @@ def get_meal_plan():
                         recipes_html += f'<h3>{para.strip()}</h3>'
                         continue
                     
-                    # レシピタイプの検出
-                    if para.strip().startswith('- 主菜：') or para.strip().startswith('- 副菜：'):
-                        if current_recipe:
-                            recipes_html += '</div>'
-                        current_recipe = para.strip()
-                        recipes_html += f'<div class="recipe-item">{para.strip()}</div>'
-                        continue
-                    
                     # 買い物リストの開始
-                    if para.strip() == '最後に、同じ食材を合算して買い物リストを作成してください：':
-                        if current_day:
-                            recipes_html += '</div>'
+                    if '買い物リスト' in para.strip() or '材料リスト' in para.strip():
                         is_shopping_list = True
                         continue
                     
                     if is_shopping_list:
-                        if not shopping_list_html:
-                            shopping_list_html = '<div class="shopping-list">'
-                        shopping_list_html += f'<div class="shopping-item">{para.strip()}</div>'
+                        # 買い物リストの項目を処理
+                        if para.strip().startswith('- '):
+                            item = para.strip().replace('-', '').strip()
+                            if item:
+                                shopping_list_html += f'<div class="shopping-item">{item}</div>'
                     else:
-                        # 材料や作り方の項目を処理
-                        if current_recipe:
-                            recipes_html += f'<div class="recipe-content">{para.strip()}</div>'
+                        # レシピの項目を処理
+                        if para.strip().startswith('- 主菜：') or para.strip().startswith('- 副菜：'):
+                            if current_recipe:
+                                recipes_html += '</div>'
+                            current_recipe = para.strip()
+                            recipes_html += f'<div class="recipe-item">{para.strip()}</div>'
+                        else:
+                            # 材料や作り方の項目を処理
+                            if current_recipe:
+                                recipes_html += f'<div class="recipe-content">{para.strip()}</div>'
                 
                 if current_recipe:
                     recipes_html += '</div>'
@@ -136,8 +135,7 @@ def get_meal_plan():
                     recipes_html += '</div>'
                 
                 recipes_html += '</div>'
-                if shopping_list_html:
-                    shopping_list_html += '</div>'
+                shopping_list_html += '</div>'
                 
                 print(f"Generated recipes HTML: {recipes_html}")  # デバッグ用
                 print(f"Generated shopping list HTML: {shopping_list_html}")  # デバッグ用
