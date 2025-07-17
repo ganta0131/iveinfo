@@ -123,13 +123,19 @@
             font-size: 1.8em;
             color: #2c3e50;
             font-weight: bold;
-            text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .recipe-card h4 {
+            font-size: 1.4em;
+            color: #34495e;
+            margin: 15px 0;
         }
         
         .recipe-card p {
             margin: 10px 0;
             line-height: 1.6;
+            color: #333;
         }
         
         .shopping-list-container {
@@ -348,27 +354,36 @@
             const paragraphs = recipesText.split('\n');
             let html = '';
             let currentDay = null;
+            let currentRecipe = null;
 
             paragraphs.forEach((para, index) => {
                 if (!para.trim()) return;
 
                 // 日付の検出
-                const dayMatch = para.match(/^(\d+)日目$/);
+                const dayMatch = para.match(/^\d+日目$/);
                 if (dayMatch) {
-                    if (currentDay) {
-                        html += '</div>';
-                    }
-                    currentDay = dayMatch[1];
-                    html += `<div class="recipe-card">
-                                <h3>第${para}</h3>`;
+                    currentDay = dayMatch[0];
                     return;
                 }
 
-                // レシピの内容を直接表示
+                // レシピ名の検出
+                const recipeMatch = para.match(/^(主菜|副菜)：(.+)/);
+                if (recipeMatch) {
+                    if (currentRecipe) {
+                        html += '</div>';
+                    }
+                    currentRecipe = recipeMatch[2];
+                    html += `<div class="recipe-card">
+                                <h3>${currentDay} ${recipeMatch[1]}</h3>
+                                <h4>${currentRecipe}</h4>`;
+                    return;
+                }
+
+                // 材料や作り方の内容を直接表示
                 html += `<p>${para}</p>`;
             });
 
-            if (currentDay) {
+            if (currentRecipe) {
                 html += '</div>';
             }
 
