@@ -255,10 +255,6 @@
                     })
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
                 const data = await response.json();
                 
                 if (data.success) {
@@ -287,9 +283,10 @@
 
         function formatRecipes(recipesText) {
             const paragraphs = recipesText.split('\n');
-            let html = '';
+            let html = '<div class="recipes">';
             let currentDay = null;
             let currentType = null;
+            let isShoppingList = false;
             
             paragraphs.forEach(para => {
                 const trimmed = para.trim();
@@ -308,6 +305,20 @@
                     return;
                 }
                 
+                // 買い物リストの開始
+                if (trimmed.startsWith('最後に、同じ食材を合算して買い物リストを作成してください：')) {
+                    if (currentDay) {
+                        html += '</div>';
+                    }
+                    isShoppingList = true;
+                    return;
+                }
+                
+                if (isShoppingList) {
+                    html += `<div class="shopping-item">${trimmed}</div>`;
+                    return;
+                }
+                
                 // レシピタイプの検出
                 if (trimmed.startsWith('- 主菜：') || trimmed.startsWith('- 副菜：')) {
                     if (currentType) {
@@ -322,24 +333,15 @@
                 
                 // 材料・作り方の検出
                 if (trimmed.startsWith('材料：') || trimmed.startsWith('作り方：')) {
-                    html += `<div class="recipe-section">`;
-                    html += `<h5>${trimmed}</h5>`;
-                    html += `<ul>`;
+                    html += `<div class="recipe-content">${trimmed}</div>`;
                     return;
                 }
                 
                 // リスト項目の検出
                 if (trimmed.startsWith('- ')) {
-                    html += `<li>${trimmed.replace(/^- /, '')}</li>`;
+                    const content = trimmed.replace(/^- /, '').trim();
+                    html += `<div class="recipe-content">${content}</div>`;
                     return;
-                }
-                
-                // 買い物リストの開始
-                if (trimmed.startsWith('最後に、同じ食材を合算して買い物リストを作成してください：')) {
-                    if (currentDay) {
-                        html += '</div>';
-                    }
-                    return false;
                 }
             });
             
@@ -349,6 +351,8 @@
             if (currentDay) {
                 html += '</div>';
             }
+            
+            html += '</div>';
             
             return html;
         }
