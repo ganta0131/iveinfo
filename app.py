@@ -80,7 +80,9 @@ def get_meal_plan():
         try:
             response = model.generate_content(prompt)
             meal_plan = response.text
-            print(f"Raw meal plan: {meal_plan}")  # デバッグ用
+            print("=== Raw Meal Plan ===")
+            print(meal_plan)
+            print("=== End of Raw Meal Plan ===")
             
             # レシピと買い物リストをHTML形式に変換
             try:
