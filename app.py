@@ -80,28 +80,38 @@ def get_meal_plan():
         try:
             response = model.generate_content(prompt)
             meal_plan = response.text
+            print(f"Raw meal plan: {meal_plan}")  # デバッグ用
             
             # レシピと買い物リストをHTML形式に変換
-            paragraphs = meal_plan.split('\n')
-            recipes_html = '<div class="recipes">'
-            shopping_list_html = ''
-            
-            is_shopping_list = False
-            current_day = None
-            
             try:
+                paragraphs = meal_plan.split('\n')
+                recipes_html = '<div class="recipes">'
+                shopping_list_html = ''
+                
+                is_shopping_list = False
+                current_day = None
+                current_recipe = None
+                
                 for para in paragraphs:
                     if not para.strip():
                         continue
                     
                     # 日付の検出
-                    day_match = re.match(r'^(\d+)日目$', para.strip())
+                    day_match = re.match(r'^\d+日目$', para.strip())
                     if day_match:
                         if current_day:
                             recipes_html += '</div>'
                         current_day = day_match.group(1)
                         recipes_html += f'<div class="recipe-day">'
                         recipes_html += f'<h3>{para.strip()}</h3>'
+                        continue
+                    
+                    # レシピタイプの検出
+                    if para.strip().startswith('- 主菜：') or para.strip().startswith('- 副菜：'):
+                        if current_recipe:
+                            recipes_html += '</div>'
+                        current_recipe = para.strip()
+                        recipes_html += f'<div class="recipe-item">{para.strip()}</div>'
                         continue
                     
                     # 買い物リストの開始
@@ -116,8 +126,12 @@ def get_meal_plan():
                             shopping_list_html = '<div class="shopping-list">'
                         shopping_list_html += f'<div class="shopping-item">{para.strip()}</div>'
                     else:
-                        recipes_html += f'<div class="recipe-item">{para.strip()}</div>'
+                        # 材料や作り方の項目を処理
+                        if current_recipe:
+                            recipes_html += f'<div class="recipe-content">{para.strip()}</div>'
                 
+                if current_recipe:
+                    recipes_html += '</div>'
                 if current_day:
                     recipes_html += '</div>'
                 
@@ -125,112 +139,8 @@ def get_meal_plan():
                 if shopping_list_html:
                     shopping_list_html += '</div>'
                 
-                return jsonify({
-                    'success': True,
-                    'recipes': recipes_html,
-                    'shoppingList': shopping_list_html
-                })
-            except Exception as e:
-                print(f"Error in response processing: {str(e)}")
-                return jsonify({
-                    'success': False,
-                    'error': 'Error processing response'
-                }), 500
-        except Exception as e:
-            return jsonify({
-                'success': False,
-                'error': str(e)
-            }), 500
-    except Exception as e:
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-
-        # プロンプトの作成
-        prompt = f"""以下の条件に基づいて、1週間分の夕食レシピ（主菜＋副菜）を生成してください。
-
-条件：
-- 人数：{people}人
-- 献立日数：{days}日
-- 和食：{japanese}日
-- 洋食：{western}日
-- 中華：{chinese}日
-- 1日あたりの材料費は300円以内
-- 使用食材は週内で共通化（少なめに）
-- 分量は人数に応じて自動調整
-- 作り方は簡潔・一般向け
-
-各日のレシピは以下の形式で出力してください：
-1日目
-- 主菜：レシピ名
-  材料：
-  - 材料1：分量
-  - 材料2：分量
-  作り方：
-  1. 手順1
-  2. 手順2
-- 副菜：レシピ名
-  材料：
-  - 材料1：分量
-  - 材料2：分量
-  作り方：
-  1. 手順1
-  2. 手順2
-
-最後に、同じ食材を合算して買い物リストを作成してください：
-- 材料名：合算分量
-- 材料名：合算分量
-"""
-
-        # AIによるレシピ生成
-        try:
-            response = model.generate_content(prompt)
-            meal_plan = response.text
-            
-            # レシピと買い物リストをHTML形式に変換
-            paragraphs = meal_plan.split('\n')
-            recipes_html = '<div class="recipes">'
-            shopping_list_html = ''
-            
-            is_shopping_list = False
-            current_day = None
-            
-            try:
-                for para in paragraphs:
-                    if not para.strip():
-                        continue
-                    
-                    # 日付の検出
-                    day_match = re.match(r'^(\d+)日目$', para.strip())
-                    if day_match:
-                        if current_day:
-                            recipes_html += '</div>'
-                        current_day = day_match.group(1)
-                        recipes_html += f'<div class="recipe-day">'
-                        recipes_html += f'<h3>{para.strip()}</h3>'
-                        continue
-                    
-                    # 買い物リストの開始
-                    if para.strip() == '最後に、同じ食材を合算して買い物リストを作成してください：':
-                        if current_day:
-                            recipes_html += '</div>'
-                        is_shopping_list = True
-                        continue
-                    
-                    if is_shopping_list:
-                        if not shopping_list_html:
-                            shopping_list_html = '<div class="shopping-list">'
-                        shopping_list_html += f'<div class="shopping-item">{para.strip()}</div>'
-                    else:
-                        recipes_html += f'<div class="recipe-item">{para.strip()}</div>'
-                
-                if current_day:
-                    recipes_html += '</div>'
-                
-                recipes_html += '</div>'
-                if shopping_list_html:
-                    shopping_list_html += '</div>'
+                print(f"Generated recipes HTML: {recipes_html}")  # デバッグ用
+                print(f"Generated shopping list HTML: {shopping_list_html}")  # デバッグ用
                 
                 return jsonify({
                     'success': True,
@@ -238,15 +148,18 @@ def get_meal_plan():
                     'shoppingList': shopping_list_html
                 })
             except Exception as e:
-                print(f"Error in response processing: {str(e)}")
+                print(f"Error processing response: {str(e)}")
+                print(f"Full traceback: {traceback.format_exc()}")
                 return jsonify({
                     'success': False,
-                    'error': 'Error processing response'
+                    'error': f'Error processing response: {str(e)}'
                 }), 500
         except Exception as e:
+            print(f"Error generating meal plan: {str(e)}")
+            print(f"Full traceback: {traceback.format_exc()}")
             return jsonify({
                 'success': False,
-                'error': str(e)
+                'error': f'Error generating meal plan: {str(e)}'
             }), 500
     except Exception as e:
         return jsonify({
