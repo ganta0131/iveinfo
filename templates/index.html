@@ -108,29 +108,56 @@
         }
 
         .recipes {
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
         
         .recipe-day {
-            margin-bottom: 25px;
-            padding: 20px;
+            margin-bottom: 30px;
+            padding: 25px;
             background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-radius: 10px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+        
+        .recipe-day h3 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            color: #2c3e50;
         }
         
         .recipe-type {
-            margin-bottom: 20px;
-            padding: 15px;
+            margin-bottom: 25px;
+            padding: 20px;
             background-color: #f8f9fa;
-            border-radius: 6px;
+            border-radius: 8px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .recipe-type h4 {
+            margin: 0 0 15px 0;
+            font-size: 1.2em;
+            color: #34495e;
         }
         
         .recipe-content {
-            margin-left: 20px;
-            font-size: 0.9em;
-            color: #333;
-            line-height: 1.5;
+            margin: 10px 0;
+            padding: 10px 0;
+            font-size: 1em;
+            color: #2c3e50;
+            line-height: 1.6;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .recipe-content:last-child {
+            border-bottom: none;
+        }
+        
+        .recipe-content p {
+            margin: 0;
+            padding: 0;
         }
         
         .shopping-list {
