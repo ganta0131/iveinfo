@@ -56,7 +56,7 @@ def get_meal_plan():
 - 買い物リストには調味料（塩、こしょう、醤油、みりん、酒、酢、砂糖など）を含めない
 
 各日のレシピは以下の形式で出力してください：
-1日目
+1日目（和食）
 - 主菜：レシピ名
   材料：
   - 材料1：分量
@@ -112,8 +112,7 @@ def get_meal_plan():
                     recipes_text = cleaned_text
                     shopping_text = ""
                 
-                # 和食、洋食、中華の順番を決定
-                genre_order = ['和食'] * japanese + ['洋食'] * western + ['中華'] * chinese
+
                 
                 # テキストを分割して日別のレシピを処理
                 day_texts = [f"{d}日目" for d in range(1, days + 1)]
@@ -122,8 +121,12 @@ def get_meal_plan():
                 
                 # まず全ての日付の内容を取得
                 for i, day_text in enumerate(day_texts):
+                    # ジャンルを含む形式で検索
+                    genre = "和食" if i < japanese else "洋食" if i < japanese + western else "中華"
+                    search_text = f"{day_text}（{genre}）"
+                    
                     next_text = f"{i + 2}日目" if i < len(day_texts) - 1 else None
-                    day_start = recipes_text.find(day_text, current_start)
+                    day_start = recipes_text.find(search_text, current_start)
                     
                     if day_start != -1:
                         day_end = recipes_text.find(next_text, day_start) if next_text else len(recipes_text)
@@ -138,12 +141,18 @@ def get_meal_plan():
                 for day in range(1, days + 1):
                     day_text = f"{day}日目"
                     day_content = day_contents[day-1]
-                    genre = genre_order[day-1]  # ジャンルを取得
+                    
+                    # ジャンルを取得（Geminiからの出力に含まれる形式）
+                    genre_start = day_content.find(f"{day_text}（")
+                    if genre_start != -1:
+                        genre_end = day_content.find("）", genre_start)
+                        if genre_end != -1:
+                            genre = day_content[genre_start + len(f"{day_text}（"):genre_end]
+                    else:
+                        genre = "和食"  # デフォルト
                     
                     recipes_html += f'<div class="recipe-day">'
-                    # ジャンルの表示
-                    genre = genre_order[day-1]  # ジャンルを取得
-                    recipes_html += f'<h3>{day_text}({genre})</h3>'
+                    recipes_html += f'<h3>{day_text}（{genre}）</h3>'
                     
                     # レシピの内容を表示
                     if day_content:
