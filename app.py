@@ -87,77 +87,68 @@ def get_meal_plan():
             
             # レシピと買い物リストをHTML形式に変換
             try:
-                paragraphs = meal_plan.split('\n')
+                # テキストをクリーニング
+                cleaned_text = meal_plan.strip()
+                print(f"=== Cleaned Text ===")
+                print(cleaned_text)
+                print("=== End of Cleaned Text ===")
+                
+                # 買い物リストの開始位置を特定
+                shopping_start = cleaned_text.find('買い物リスト')
+                if shopping_start == -1:
+                    shopping_start = cleaned_text.find('材料リスト')
+                
+                if shopping_start != -1:
+                    # 買い物リストとそれ以前のテキストに分割
+                    recipes_text = cleaned_text[:shopping_start].strip()
+                    shopping_text = cleaned_text[shopping_start:].strip()
+                else:
+                    recipes_text = cleaned_text
+                    shopping_text = ""
+                
+                # レシピのHTML生成
                 recipes_html = '<div class="recipes">'
-                shopping_list_html = '<div class="shopping-list">'
                 
-                is_shopping_list = False
-                current_day = None
-                current_recipe = None
-                current_section = None
-                
-                for para in paragraphs:
-                    if not para.strip():
-                        continue
-                    
-                    # 日付の検出
-                    day_match = re.match(r'^\d+日目$', para.strip())
-                    if day_match:
-                        if current_day:
+                # 日別のレシピを処理
+                for day in range(1, days + 1):
+                    day_text = f"{day}日目"
+                    day_start = recipes_text.find(day_text)
+                    if day_start != -1:
+                        day_end = recipes_text.find(f"{day + 1}日目") if day < days else len(recipes_text)
+                        day_content = recipes_text[day_start:day_end].strip()
+                        
+                        if day_content:
+                            recipes_html += f'<div class="recipe-day">'
+                            recipes_html += f'<h3>{day_text}</h3>'
+                            
+                            # 主菜と副菜を処理
+                            main_dish = day_content.find('- 主菜：')
+                            side_dish = day_content.find('- 副菜：')
+                            
+                            if main_dish != -1:
+                                main_content = day_content[main_dish:].split('- 副菜：')[0].strip()
+                                recipes_html += f'<div class="recipe-item">{main_content}</div>'
+                            
+                            if side_dish != -1:
+                                side_content = day_content[side_dish:].strip()
+                                recipes_html += f'<div class="recipe-item">{side_content}</div>'
+                            
                             recipes_html += '</div>'
-                        current_day = day_match.group(1)
-                        recipes_html += f'<div class="recipe-day">'
-                        recipes_html += f'<h3>{para.strip()}</h3>'
-                        continue
-                    
-                    # 買い物リストの開始
-                    if '買い物リスト' in para.strip() or '材料リスト' in para.strip():
-                        is_shopping_list = True
-                        continue
-                    
-                    # レシピタイプの検出
-                    if para.strip().startswith('- 主菜：') or para.strip().startswith('- 副菜：'):
-                        if current_recipe:
-                            recipes_html += '</div>'
-                        current_recipe = para.strip()
-                        recipes_html += f'<div class="recipe-item">{para.strip()}</div>'
-                        current_section = None
-                        continue
-                    
-                    # セクションの検出
-                    if para.strip().startswith('材料：') or para.strip().startswith('作り方：'):
-                        current_section = para.strip()
-                        recipes_html += f'<div class="recipe-section">'
-                        recipes_html += f'<h4>{para.strip()}</h4>'
-                        continue
-                    
-                    if is_shopping_list:
-                        # 買い物リストの項目を処理
-                        if para.strip().startswith('- '):
-                            item = para.strip().replace('-', '').strip()
-                            if item:
-                                shopping_list_html += f'<div class="shopping-item">{item}</div>'
-                    else:
-                        # レシピの項目を処理
-                        if current_recipe:
-                            if current_section:
-                                # 材料や作り方の項目を処理
-                                if para.strip().startswith('- '):
-                                    item = para.strip().replace('-', '').strip()
-                                    if item:
-                                        recipes_html += f'<div class="recipe-content">{item}</div>'
-                                else:
-                                    recipes_html += f'<div class="recipe-content">{para.strip()}</div>'
-                            else:
-                                # レシピ名の下の説明を処理
-                                recipes_html += f'<div class="recipe-content">{para.strip()}</div>'
-                
-                if current_recipe:
-                    recipes_html += '</div>'
-                if current_day:
-                    recipes_html += '</div>'
                 
                 recipes_html += '</div>'
+                
+                # 買い物リストのHTML生成
+                shopping_list_html = '<div class="shopping-list">'
+                
+                if shopping_text:
+                    # 買い物リストの項目を処理
+                    items = shopping_text.split('\n')
+                    for item in items:
+                        if item.strip().startswith('- '):
+                            clean_item = item.strip().replace('-', '').strip()
+                            if clean_item:
+                                shopping_list_html += f'<div class="shopping-item">{clean_item}</div>'
+                
                 shopping_list_html += '</div>'
                 
                 print(f"Generated recipes HTML: {recipes_html}")  # デバッグ用
@@ -169,11 +160,12 @@ def get_meal_plan():
                     'shoppingList': shopping_list_html
                 })
             except Exception as e:
-                print(f"Error processing response: {str(e)}")
+                error_msg = f"Error processing response: {str(e)}"
+                print(error_msg)
                 print(f"Full traceback: {traceback.format_exc()}")
                 return jsonify({
                     'success': False,
-                    'error': f'Error processing response: {str(e)}'
+                    'error': error_msg
                 }), 500
         except Exception as e:
             print(f"Error generating meal plan: {str(e)}")
