@@ -302,9 +302,14 @@
                 console.log('API Response:', data); // デバッグ用
                 
                 if (data.success) {
+                    // データの確認
+                    console.log('Recipes data:', data.recipes);
+                    console.log('Shopping list data:', data.shoppingList);
+                    
                     // 結果の表示
                     if (data.recipes && data.recipes.trim()) {
                         const formattedRecipes = formatRecipes(data.recipes);
+                        console.log('Formatted recipes:', formattedRecipes);
                         recipes.innerHTML = formattedRecipes;
                     } else {
                         recipes.innerHTML = '<div class="error">レシピデータがありません</div>';
@@ -341,79 +346,16 @@
 
         function formatRecipes(recipesText) {
             try {
-                const paragraphs = recipesText.split('\n');
-                let html = '<div class="recipes">';
-                let currentDay = null;
-                let currentType = null;
-                let isShoppingList = false;
-                
+                // バックエンドから既にHTMLが生成されているので、そのまま返す
                 console.log('Raw recipes text:', recipesText); // デバッグ用
                 
-                paragraphs.forEach(para => {
-                    const trimmed = para.trim();
-                    if (!trimmed) return;
-                    
-                    // 日付の検出
-                    const dayMatch = trimmed.match(/^\d+日目$/);
-                    if (dayMatch) {
-                        if (currentDay) {
-                            html += '</div>';
-                        }
-                        html += `<div class="recipe-day">`;
-                        html += `<h3>${trimmed}</h3>`;
-                        currentDay = trimmed;
-                        currentType = null;
-                        return;
-                    }
-                    
-                    // 買い物リストの開始
-                    if (trimmed.startsWith('最後に、同じ食材を合算して買い物リストを作成してください：')) {
-                        if (currentDay) {
-                            html += '</div>';
-                        }
-                        isShoppingList = true;
-                        return;
-                    }
-                    
-                    if (isShoppingList) {
-                        html += `<div class="shopping-item">${trimmed}</div>`;
-                        return;
-                    }
-                    
-                    // レシピタイプの検出
-                    if (trimmed.startsWith('- 主菜：') || trimmed.startsWith('- 副菜：')) {
-                        if (currentType) {
-                            html += '</div>';
-                        }
-                        const type = trimmed.startsWith('- 主菜：') ? '主菜' : '副菜';
-                        html += `<div class="recipe-type">`;
-                        html += `<h4>${type}</h4>`;
-                        currentType = type;
-                        return;
-                    }
-                    
-                    // 材料・作り方の検出
-                    if (trimmed.startsWith('材料：') || trimmed.startsWith('作り方：')) {
-                        html += `<div class="recipe-content">${trimmed}</div>`;
-                        return;
-                    }
-                    
-                    // リスト項目の検出
-                    if (trimmed.startsWith('- ')) {
-                        const content = trimmed.replace(/^- /, '').trim();
-                        html += `<div class="recipe-content">${content}</div>`;
-                        return;
-                    }
-                });
+                // 不要なタグを削除
+                const cleanedHtml = recipesText
+                    .replace(/<div class="recipes">/g, '')
+                    .replace(/<\/div>/g, '');
                 
-                if (currentType) {
-                    html += '</div>';
-                }
-                if (currentDay) {
-                    html += '</div>';
-                }
-                
-                html += '</div>';
+                // 最初と最後のタグを追加
+                const html = `<div class="recipes">${cleanedHtml}</div>`;
                 
                 console.log('Generated HTML:', html); // デバッグ用
                 return html;
