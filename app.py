@@ -141,6 +141,8 @@ def get_meal_plan():
                     genre = genre_order[day-1]  # ジャンルを取得
                     
                     recipes_html += f'<div class="recipe-day">'
+                    # ジャンルの表示
+                    genre = genre_order[day-1]  # ジャンルを取得
                     recipes_html += f'<h3>{day_text}({genre})</h3>'
                     
                     # レシピの内容を表示
