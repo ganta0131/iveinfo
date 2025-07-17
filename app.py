@@ -113,17 +113,53 @@ def get_meal_plan():
                 # 和食、洋食、中華の順番で割り当てる
                 genre_order = ['和食'] * japanese + ['洋食'] * western + ['中華'] * chinese
                 
+                # テキストを分割して日別のレシピを処理
+                day_texts = [f"{d}日目" for d in range(1, days + 1)]
+                day_contents = []
+                current_start = 0
+                
+                # まず全ての日付の内容を取得
+                for i, day_text in enumerate(day_texts):
+                    next_text = f"{i + 2}日目" if i < len(day_texts) - 1 else None
+                    day_start = recipes_text.find(day_text, current_start)
+                    
+                    if day_start != -1:
+                        day_end = recipes_text.find(next_text, day_start) if next_text else len(recipes_text)
+                        day_content = recipes_text[day_start:day_end].strip()
+                        day_contents.append(day_content)
+                        current_start = day_end
+                    else:
+                        day_contents.append("")
+                
+                # レシピを表示
                 for day in range(1, days + 1):
                     day_text = f"{day}日目"
-                    day_start = recipes_text.find(day_text)
-                    if day_start != -1:
-                        day_end = recipes_text.find(f"{day + 1}日目") if day < days else len(recipes_text)
-                        day_content = recipes_text[day_start:day_end].strip()
+                    day_content = day_contents[day-1]
+                    genre = genre_order[day-1]  # ジャンルを取得
+                    
+                    recipes_html += f'<div class="recipe-day">'
+                    recipes_html += f'<h3>{day_text}({genre})</h3>'
+                    
+                    # レシピの内容を表示
+                    if day_content:
+                        # 主菜を処理
+                        main_dish_start = day_content.find('- 主菜：')
+                        if main_dish_start != -1:
+                            main_dish_end = day_content.find('- 副菜：', main_dish_start)
+                            if main_dish_end == -1:
+                                main_dish_end = len(day_content)
+                            main_content = day_content[main_dish_start:main_dish_end].strip()
+                            if main_content:
+                                recipes_html += f'<div class="recipe-item"><u>{main_content}</u></div>'
                         
-                        if day_content:
-                            genre = genre_order[day-1]  # ジャンルを取得
-                            recipes_html += f'<div class="recipe-day">'
-                            recipes_html += f'<h3>{day_text}({genre})</h3>'
+                        # 副菜を処理
+                        side_dish_start = day_content.find('- 副菜：')
+                        if side_dish_start != -1:
+                            side_content = day_content[side_dish_start:].strip()
+                            if side_content:
+                                recipes_html += f'<div class="recipe-item"><u>{side_content}</u></div>'
+                    
+                    recipes_html += '</div>'
                             
                             # 主菜と副菜を処理
                             main_dish = day_content.find('- 主菜：')
