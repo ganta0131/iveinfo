@@ -114,7 +114,7 @@
             margin-bottom: 20px;
         }
         
-        .recipe-day, .shopping-list {
+        .recipe-day {
             margin-bottom: 30px;
             padding: 25px;
             background-color: white;
@@ -122,13 +122,13 @@
             box-shadow: 0 3px 6px rgba(0,0,0,0.1);
         }
         
-        .recipe-day h3, .shopping-list h3 {
+        .recipe-day h3 {
             margin-bottom: 20px;
             font-size: 1.5em;
             color: #2c3e50;
         }
         
-        .recipe-type, .shopping-item {
+        .recipe-type {
             margin-bottom: 25px;
             padding: 20px;
             background-color: #f8f9fa;
@@ -136,13 +136,13 @@
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
         }
         
-        .recipe-type h4, .shopping-item h4 {
+        .recipe-type h4 {
             margin: 0 0 15px 0;
             font-size: 1.2em;
             color: #34495e;
         }
         
-        .recipe-content, .shopping-item-content {
+        .recipe-content {
             margin: 10px 0;
             padding: 10px 0;
             font-size: 1em;
@@ -154,11 +154,11 @@
             gap: 10px;
         }
         
-        .recipe-content:last-child, .shopping-item-content:last-child {
+        .recipe-content:last-child {
             border-bottom: none;
         }
         
-        .recipe-content p, .shopping-item-content p {
+        .recipe-content p {
             margin: 0;
             padding: 0;
         }
@@ -249,7 +249,15 @@
 
         <div id="resultContainer" class="result-container" style="display: none;">
             <div id="recipes"></div>
-            <div id="shoppingList"></div>
+            <div class="recipes">
+                <div class="recipe-day">
+                    <h3>買い物リスト</h3>
+                    <div class="recipe-type">
+                        <h4>食材一覧</h4>
+                        <div id="shoppingList"></div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
