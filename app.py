@@ -154,14 +154,36 @@ def get_meal_plan():
                                 main_dish_end = len(day_content)
                             main_content = day_content[main_dish_start:main_dish_end].strip()
                             if main_content:
-                                recipes_html += f'<div class="recipe-item"><u>{main_content}</u></div>'
+                                # タイトル行のみ下線を引く
+                                title_end = main_content.find('\n')
+                                if title_end == -1:
+                                    title_end = len(main_content)
+                                title = main_content[:title_end].strip()
+                                rest = main_content[title_end:].strip()
+                                
+                                recipes_html += f'<div class="recipe-item">'
+                                recipes_html += f'<div class="recipe-title"><u>{title}</u></div>'
+                                if rest:
+                                    recipes_html += f'<div class="recipe-content">{rest}</div>'
+                                recipes_html += '</div>'
                         
                         # 副菜を処理
                         side_dish_start = day_content.find('- 副菜：')
                         if side_dish_start != -1:
                             side_content = day_content[side_dish_start:].strip()
                             if side_content:
-                                recipes_html += f'<div class="recipe-item"><u>{side_content}</u></div>'
+                                # タイトル行のみ下線を引く
+                                title_end = side_content.find('\n')
+                                if title_end == -1:
+                                    title_end = len(side_content)
+                                title = side_content[:title_end].strip()
+                                rest = side_content[title_end:].strip()
+                                
+                                recipes_html += f'<div class="recipe-item">'
+                                recipes_html += f'<div class="recipe-title"><u>{title}</u></div>'
+                                if rest:
+                                    recipes_html += f'<div class="recipe-content">{rest}</div>'
+                                recipes_html += '</div>'
                     
                     recipes_html += '</div>'
                 recipes_html += '</div>'
