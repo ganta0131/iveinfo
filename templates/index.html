@@ -119,7 +119,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         
-        .recipe-item {
+        .recipe-type {
             margin-bottom: 20px;
             padding: 15px;
             background-color: #f8f9fa;
@@ -130,6 +130,7 @@
             margin-left: 20px;
             font-size: 0.9em;
             color: #333;
+            line-height: 1.5;
         }
         
         .shopping-list {
@@ -153,6 +154,40 @@
             font-size: 14px;
             margin-top: 5px;
         }
+
+        .search-button {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        .search-button:hover {
+            background-color: #45a049;
+        }
+
+        .search-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        #recipes {
+            margin-bottom: 30px;
+        }
+
+        #shoppingList {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
     </style>
 </head>
 <body>
@@ -163,14 +198,11 @@
                 <label for="people">人数</label>
                 <input type="number" id="people" name="people" min="1" value="2" required>
             </div>
-            
             <div class="form-group">
-                <label for="days">献立日数（1〜7日）</label>
+                <label for="days">日数</label>
                 <input type="number" id="days" name="days" min="1" max="7" value="7" required>
             </div>
-            
             <div class="form-group">
-                <label>和食・洋食・中華の希望日数</label>
                 <div class="slider-group">
                     <div class="slider-item">
                         <label for="japanese">和食</label>
@@ -227,11 +259,20 @@
 
             try {
                 // バリデーション
-                const days = parseInt(form.days.value);
-                const japanese = parseInt(form.japanese.value);
-                const western = parseInt(form.western.value);
-                const chinese = parseInt(form.chinese.value);
+                const people = parseInt(form.people.value) || 1;
+                const days = parseInt(form.days.value) || 7;
+                const japanese = parseInt(form.japanese.value) || 0;
+                const western = parseInt(form.western.value) || 0;
+                const chinese = parseInt(form.chinese.value) || 0;
 
+                if (isNaN(people) || people < 1) {
+                    showError('人数は1以上を指定してください');
+                    return;
+                }
+                if (isNaN(days) || days < 1 || days > 7) {
+                    showError('日数は1〜7日の間で指定してください');
+                    return;
+                }
                 if (japanese + western + chinese !== days) {
                     showError('和食・洋食・中華の合計日数が指定された日数と一致しません');
                     return;
@@ -239,6 +280,8 @@
 
                 // ローディング表示
                 resultContainer.style.display = 'none';
+                recipes.innerHTML = '<div class="loading">レシピを生成中...</div>';
+                shoppingList.innerHTML = '';
 
                 // API呼び出し
                 const response = await fetch('/get_meal_plan', {
@@ -247,7 +290,7 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        people: form.people.value,
+                        people: people,
                         days: days,
                         japanese: japanese,
                         western: western,
@@ -256,17 +299,32 @@
                 });
                 
                 const data = await response.json();
+                console.log('API Response:', data); // デバッグ用
                 
                 if (data.success) {
                     // 結果の表示
-                    const formattedRecipes = formatRecipes(data.recipes);
-                    recipes.innerHTML = formattedRecipes;
-                    shoppingList.innerHTML = data.shoppingList;
+                    if (data.recipes && data.recipes.trim()) {
+                        const formattedRecipes = formatRecipes(data.recipes);
+                        recipes.innerHTML = formattedRecipes;
+                    } else {
+                        recipes.innerHTML = '<div class="error">レシピデータがありません</div>';
+                    }
+                    
+                    if (data.shoppingList && data.shoppingList.trim()) {
+                        shoppingList.innerHTML = `<div class="shopping-list">${data.shoppingList}</div>`;
+                    } else {
+                        shoppingList.innerHTML = '<div class="error">買い物リストが生成できませんでした</div>';
+                    }
+                    
                     resultContainer.style.display = 'block';
                 } else {
                     throw new Error(data.error || 'エラーが発生しました');
                 }
             } catch (error) {
+                console.error('Error:', error);
+                recipes.innerHTML = '';
+                shoppingList.innerHTML = '';
+                resultContainer.style.display = 'block';
                 showError(error.message);
             }
         });
@@ -282,79 +340,87 @@
         }
 
         function formatRecipes(recipesText) {
-            const paragraphs = recipesText.split('\n');
-            let html = '<div class="recipes">';
-            let currentDay = null;
-            let currentType = null;
-            let isShoppingList = false;
-            
-            paragraphs.forEach(para => {
-                const trimmed = para.trim();
-                if (!trimmed) return;
+            try {
+                const paragraphs = recipesText.split('\n');
+                let html = '<div class="recipes">';
+                let currentDay = null;
+                let currentType = null;
+                let isShoppingList = false;
                 
-                // 日付の検出
-                const dayMatch = trimmed.match(/^\d+日目$/);
-                if (dayMatch) {
-                    if (currentDay) {
-                        html += '</div>';
+                console.log('Raw recipes text:', recipesText); // デバッグ用
+                
+                paragraphs.forEach(para => {
+                    const trimmed = para.trim();
+                    if (!trimmed) return;
+                    
+                    // 日付の検出
+                    const dayMatch = trimmed.match(/^\d+日目$/);
+                    if (dayMatch) {
+                        if (currentDay) {
+                            html += '</div>';
+                        }
+                        html += `<div class="recipe-day">`;
+                        html += `<h3>${trimmed}</h3>`;
+                        currentDay = trimmed;
+                        currentType = null;
+                        return;
                     }
-                    html += `<div class="recipe-day">`;
-                    html += `<h3>${trimmed}</h3>`;
-                    currentDay = trimmed;
-                    currentType = null;
-                    return;
-                }
-                
-                // 買い物リストの開始
-                if (trimmed.startsWith('最後に、同じ食材を合算して買い物リストを作成してください：')) {
-                    if (currentDay) {
-                        html += '</div>';
+                    
+                    // 買い物リストの開始
+                    if (trimmed.startsWith('最後に、同じ食材を合算して買い物リストを作成してください：')) {
+                        if (currentDay) {
+                            html += '</div>';
+                        }
+                        isShoppingList = true;
+                        return;
                     }
-                    isShoppingList = true;
-                    return;
-                }
-                
-                if (isShoppingList) {
-                    html += `<div class="shopping-item">${trimmed}</div>`;
-                    return;
-                }
-                
-                // レシピタイプの検出
-                if (trimmed.startsWith('- 主菜：') || trimmed.startsWith('- 副菜：')) {
-                    if (currentType) {
-                        html += '</div>';
+                    
+                    if (isShoppingList) {
+                        html += `<div class="shopping-item">${trimmed}</div>`;
+                        return;
                     }
-                    const type = trimmed.startsWith('- 主菜：') ? '主菜' : '副菜';
-                    html += `<div class="recipe-type">`;
-                    html += `<h4>${type}</h4>`;
-                    currentType = type;
-                    return;
+                    
+                    // レシピタイプの検出
+                    if (trimmed.startsWith('- 主菜：') || trimmed.startsWith('- 副菜：')) {
+                        if (currentType) {
+                            html += '</div>';
+                        }
+                        const type = trimmed.startsWith('- 主菜：') ? '主菜' : '副菜';
+                        html += `<div class="recipe-type">`;
+                        html += `<h4>${type}</h4>`;
+                        currentType = type;
+                        return;
+                    }
+                    
+                    // 材料・作り方の検出
+                    if (trimmed.startsWith('材料：') || trimmed.startsWith('作り方：')) {
+                        html += `<div class="recipe-content">${trimmed}</div>`;
+                        return;
+                    }
+                    
+                    // リスト項目の検出
+                    if (trimmed.startsWith('- ')) {
+                        const content = trimmed.replace(/^- /, '').trim();
+                        html += `<div class="recipe-content">${content}</div>`;
+                        return;
+                    }
+                });
+                
+                if (currentType) {
+                    html += '</div>';
+                }
+                if (currentDay) {
+                    html += '</div>';
                 }
                 
-                // 材料・作り方の検出
-                if (trimmed.startsWith('材料：') || trimmed.startsWith('作り方：')) {
-                    html += `<div class="recipe-content">${trimmed}</div>`;
-                    return;
-                }
-                
-                // リスト項目の検出
-                if (trimmed.startsWith('- ')) {
-                    const content = trimmed.replace(/^- /, '').trim();
-                    html += `<div class="recipe-content">${content}</div>`;
-                    return;
-                }
-            });
-            
-            if (currentType) {
                 html += '</div>';
+                
+                console.log('Generated HTML:', html); // デバッグ用
+                return html;
+            } catch (error) {
+                console.error('Error in formatRecipes:', error);
+                return '<div class="error">レシピのフォーマットに失敗しました</div>';
             }
-            if (currentDay) {
-                html += '</div>';
-            }
-            
-            html += '</div>';
-            
-            return html;
         }
     </script>
 </body>
