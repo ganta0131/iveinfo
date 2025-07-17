@@ -110,6 +110,9 @@ def get_meal_plan():
                 recipes_html = '<div class="recipes">'
                 
                 # 日別のレシピを処理
+                # 和食、洋食、中華の順番で割り当てる
+                genre_order = ['和食'] * japanese + ['洋食'] * western + ['中華'] * chinese
+                
                 for day in range(1, days + 1):
                     day_text = f"{day}日目"
                     day_start = recipes_text.find(day_text)
@@ -118,8 +121,9 @@ def get_meal_plan():
                         day_content = recipes_text[day_start:day_end].strip()
                         
                         if day_content:
+                            genre = genre_order[day-1]  # ジャンルを取得
                             recipes_html += f'<div class="recipe-day">'
-                            recipes_html += f'<h3>{day_text}</h3>'
+                            recipes_html += f'<h3>{day_text}({genre})</h3>'
                             
                             # 主菜と副菜を処理
                             main_dish = day_content.find('- 主菜：')
