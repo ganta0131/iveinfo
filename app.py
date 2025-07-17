@@ -162,7 +162,7 @@ def get_meal_plan():
                                 rest = main_content[title_end:].strip()
                                 
                                 recipes_html += f'<div class="recipe-item">'
-                                recipes_html += f'<div class="recipe-title"><u>{title}</u></div>'
+                                recipes_html += f'<div class="recipe-title"><u><strong>{title}</strong></u></div>'
                                 if rest:
                                     recipes_html += f'<div class="recipe-content">{rest}</div>'
                                 recipes_html += '</div>'
@@ -180,7 +180,7 @@ def get_meal_plan():
                                 rest = side_content[title_end:].strip()
                                 
                                 recipes_html += f'<div class="recipe-item">'
-                                recipes_html += f'<div class="recipe-title"><u>{title}</u></div>'
+                                recipes_html += f'<div class="recipe-title"><u><strong>{title}</strong></u></div>'
                                 if rest:
                                     recipes_html += f'<div class="recipe-content">{rest}</div>'
                                 recipes_html += '</div>'
