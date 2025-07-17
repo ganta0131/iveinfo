@@ -262,7 +262,13 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(formData)
+                    body: JSON.stringify({
+                        people: form.people.value,
+                        days: days,
+                        japanese: japanese,
+                        western: western,
+                        chinese: chinese
+                    })
                 });
                 
                 if (!response.ok) {
@@ -272,27 +278,27 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    document.getElementById('results').style.display = 'block';
-                    document.getElementById('recipes').innerHTML = formatRecipes(data.recipes);
-                    document.getElementById('shoppingList').innerHTML = data.shoppingList;
+                    // 結果の表示
+                    const formattedRecipes = formatRecipes(data.recipes);
+                    recipes.innerHTML = formattedRecipes;
+                    shoppingList.innerHTML = data.shoppingList;
+                    resultContainer.style.display = 'block';
                 } else {
-                    throw new Error(data.error || 'API returned an error');
+                    throw new Error(data.error || 'エラーが発生しました');
                 }
             } catch (error) {
-                console.error('Error details:', error);
-                showError(`エラーが発生しました: ${error.message}`);
-            } finally {
-                document.getElementById('loading').style.display = 'none';
+                showError(error.message);
             }
         });
 
         function showError(message) {
-            const errorDiv = document.getElementById('typeError');
-            errorDiv.textContent = message;
-            errorDiv.style.display = 'block';
+            const errorElement = document.createElement('div');
+            errorElement.className = 'error';
+            errorElement.textContent = message;
+            document.getElementById('mealPlanForm').appendChild(errorElement);
             setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 5000);
+                errorElement.remove();
+            }, 3000);
         }
 
         function formatRecipes(recipesText) {
