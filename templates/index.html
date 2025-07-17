@@ -20,6 +20,33 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             max-width: 800px;
             margin: 0 auto;
+            position: relative;
+        }
+
+        .description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-message {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
         }
         
         h1 {
@@ -196,33 +223,34 @@
 <body>
     <div class="container">
         <h1>節約献立プランナー</h1>
+        <p class="description">AIで献立を提案し、買い物リストを作成します。</p>
         <form id="mealPlanForm">
             <div class="form-group">
-                <label for="people">人数</label>
+                <label for="people">家族の人数</label>
                 <input type="number" id="people" name="people" min="1" value="2" required>
             </div>
             <div class="form-group">
-                <label for="days">日数</label>
+                <label for="days">献立を生成する日数</label>
                 <input type="number" id="days" name="days" min="1" max="7" value="7" required>
             </div>
             <div class="form-group">
                 <div class="slider-group">
                     <div class="slider-item">
-                        <label for="japanese">和食</label>
+                        <label for="japanese">和食の日数</label>
                         <div class="slider-container">
                             <input type="range" id="japanese" name="japanese" min="0" max="7" value="3" class="slider">
                             <span id="japaneseValue" class="slider-value">3</span>
                         </div>
                     </div>
                     <div class="slider-item">
-                        <label for="western">洋食</label>
+                        <label for="western">洋食の日数</label>
                         <div class="slider-container">
                             <input type="range" id="western" name="western" min="0" max="7" value="2" class="slider">
                             <span id="westernValue" class="slider-value">2</span>
                         </div>
                     </div>
                     <div class="slider-item">
-                        <label for="chinese">中華</label>
+                        <label for="chinese">中華の日数</label>
                         <div class="slider-container">
                             <input type="range" id="chinese" name="chinese" min="0" max="7" value="2" class="slider">
                             <span id="chineseValue" class="slider-value">2</span>
@@ -285,8 +313,13 @@
                 }
 
                 // ローディング表示
+                const loadingOverlay = document.createElement('div');
+                loadingOverlay.className = 'loading-overlay';
+                loadingOverlay.innerHTML = '<div class="loading-message">生成中...</div>';
+                document.body.appendChild(loadingOverlay);
+                
                 resultContainer.style.display = 'none';
-                recipes.innerHTML = '<div class="loading">レシピを生成中...</div>';
+                recipes.innerHTML = '';
                 shoppingList.innerHTML = '';
 
                 // API呼び出し
@@ -325,6 +358,12 @@
                         shoppingList.innerHTML = `<div class="shopping-list">${data.shoppingList}</div>`;
                     } else {
                         shoppingList.innerHTML = '<div class="error">買い物リストが生成できませんでした</div>';
+                    }
+                    
+                    // ローディング画面を非表示
+                    const loadingOverlay = document.querySelector('.loading-overlay');
+                    if (loadingOverlay) {
+                        loadingOverlay.remove();
                     }
                     
                     resultContainer.style.display = 'block';
