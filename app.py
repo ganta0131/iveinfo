@@ -57,14 +57,14 @@ def get_meal_plan():
 
 各日のレシピは以下の形式で出力してください：
 1日目
-主菜：レシピ名
+- 主菜：レシピ名
   材料：
   - 材料1：分量
   - 材料2：分量
   作り方：
   1. 手順1
   2. 手順2
-副菜：レシピ名
+- 副菜：レシピ名
   材料：
   - 材料1：分量
   - 材料2：分量
@@ -85,7 +85,13 @@ def get_meal_plan():
             print(meal_plan)
             print("=== End of Raw Meal Plan ===")
             
-            # レシピと買い物リストをHTML形式に変換
+            # レスポンスの形式を確認
+            if not meal_plan:
+                return jsonify({
+                    'success': False,
+                    'error': 'Geminiからのレスポンスが空です'
+                }), 500
+            
             try:
                 # テキストをクリーニング
                 cleaned_text = meal_plan.strip()
@@ -105,9 +111,6 @@ def get_meal_plan():
                 else:
                     recipes_text = cleaned_text
                     shopping_text = ""
-                
-                # レシピのHTML生成
-                recipes_html = '<div class="recipes">'
                 
                 # 日別のレシピを処理
                 # 和食、洋食、中華の順番で割り当てる
@@ -132,6 +135,7 @@ def get_meal_plan():
                         day_contents.append("")
                 
                 # レシピを表示
+                recipes_html = '<div class="recipes">'
                 for day in range(1, days + 1):
                     day_text = f"{day}日目"
                     day_content = day_contents[day-1]
@@ -160,21 +164,6 @@ def get_meal_plan():
                                 recipes_html += f'<div class="recipe-item"><u>{side_content}</u></div>'
                     
                     recipes_html += '</div>'
-                            
-                            # 主菜と副菜を処理
-                            main_dish = day_content.find('- 主菜：')
-                            side_dish = day_content.find('- 副菜：')
-                            
-                            if main_dish != -1:
-                                main_content = day_content[main_dish:].split('- 副菜：')[0].strip()
-                                recipes_html += f'<div class="recipe-item"><u>{main_content}</u></div>'
-                            
-                            if side_dish != -1:
-                                side_content = day_content[side_dish:].strip()
-                                recipes_html += f'<div class="recipe-item"><u>{side_content}</u></div>'
-                            
-                            recipes_html += '</div>'
-                
                 recipes_html += '</div>'
                 
                 # 買い物リストのHTML生成
