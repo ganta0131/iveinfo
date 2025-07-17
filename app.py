@@ -33,11 +33,15 @@ def get_meal_plan():
         chinese = int(data.get('chinese', 0))
 
         # 入力値のバリデーション
-        if not all([people, days, japanese, western, chinese]):
-            raise ValueError("全ての入力値が必要です")
+        if not all([people, days]):
+            raise ValueError("人数と日数は必須です")
         if days < 1 or days > 7:
             raise ValueError("日数は1〜7日の間で指定してください")
-        if japanese + western + chinese != days:
+        
+        # ジャンルの日数の合計が日数と一致するか確認
+        total_genre_days = japanese + western + chinese
+        if total_genre_days != days:
+            raise ValueError("和食・洋食・中華の合計日数が指定された日数と一致しません")
             raise ValueError("和食・洋食・中華の合計日数が指定された日数と一致しません")
 
         # プロンプトの作成
