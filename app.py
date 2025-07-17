@@ -121,9 +121,8 @@ def get_meal_plan():
                 
                 # まず全ての日付の内容を取得
                 for i, day_text in enumerate(day_texts):
-                    # ジャンルを含む形式で検索
-                    genre = "和食" if i < japanese else "洋食" if i < japanese + western else "中華"
-                    search_text = f"{day_text}（{genre}）"
+                    # ジャンルを含む形式で検索（Geminiからの出力に含まれる形式）
+                    search_text = f"{day_text}（"
                     
                     next_text = f"{i + 2}日目" if i < len(day_texts) - 1 else None
                     day_start = recipes_text.find(search_text, current_start)
