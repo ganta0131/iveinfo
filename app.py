@@ -112,8 +112,7 @@ def get_meal_plan():
                     recipes_text = cleaned_text
                     shopping_text = ""
                 
-                # 日別のレシピを処理
-                # 和食、洋食、中華の順番で割り当てる
+                # 和食、洋食、中華の順番を決定
                 genre_order = ['和食'] * japanese + ['洋食'] * western + ['中華'] * chinese
                 
                 # テキストを分割して日別のレシピを処理
