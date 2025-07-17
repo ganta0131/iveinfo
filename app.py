@@ -57,14 +57,14 @@ def get_meal_plan():
 
 各日のレシピは以下の形式で出力してください：
 1日目
-- 主菜：レシピ名
+主菜：レシピ名
   材料：
   - 材料1：分量
   - 材料2：分量
   作り方：
   1. 手順1
   2. 手順2
-- 副菜：レシピ名
+副菜：レシピ名
   材料：
   - 材料1：分量
   - 材料2：分量
@@ -127,11 +127,11 @@ def get_meal_plan():
                             
                             if main_dish != -1:
                                 main_content = day_content[main_dish:].split('- 副菜：')[0].strip()
-                                recipes_html += f'<div class="recipe-item">{main_content}</div>'
+                                recipes_html += f'<div class="recipe-item"><u>{main_content}</u></div>'
                             
                             if side_dish != -1:
                                 side_content = day_content[side_dish:].strip()
-                                recipes_html += f'<div class="recipe-item">{side_content}</div>'
+                                recipes_html += f'<div class="recipe-item"><u>{side_content}</u></div>'
                             
                             recipes_html += '</div>'
                 
