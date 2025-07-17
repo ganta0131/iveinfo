@@ -110,88 +110,40 @@
             margin-bottom: 20px;
         }
 
-        .recipes {
+        .recipe-card {
             margin-bottom: 20px;
-        }
-        
-        .recipe-day {
-            margin-bottom: 30px;
-            padding: 25px;
+            padding: 20px;
             background-color: white;
             border-radius: 10px;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             border: 1px solid #ddd;
         }
         
-        .recipe-day h3 {
-            margin-bottom: 20px;
+        .recipe-card h3 {
             font-size: 1.8em;
             color: #2c3e50;
             font-weight: bold;
             text-align: center;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
+            margin-bottom: 20px;
         }
         
-        .recipe-type {
-            margin-bottom: 25px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-        
-        .recipe-type h4 {
-            margin: 0 0 15px 0;
-            font-size: 1.2em;
-            color: #34495e;
-        }
-        
-        .recipe-content {
+        .recipe-card p {
             margin: 10px 0;
-            padding: 10px 0;
-            font-size: 1em;
-            color: #2c3e50;
             line-height: 1.6;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
         }
         
-        .recipe-content:last-child {
-            border-bottom: none;
+        .shopping-list-container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         
-        .recipe-content h4 {
-            margin: 0 0 5px 0;
-            font-size: 1.1em;
-            color: #34495e;
-        }
-        
-        .recipe-content ul {
-            margin: 0;
-            padding: 0;
-            list-style-position: inside;
-        }
-        
-        .recipe-content ul li {
-            margin: 5px 0;
-            padding: 5px 0;
+        .shopping-list-container h3 {
+            margin-bottom: 20px;
             color: #2c3e50;
-        }
-        
-        .recipe-content ol {
-            margin: 0;
-            padding: 0;
-            list-style-position: inside;
-        }
-        
-        .recipe-content ol li {
-            margin: 5px 0;
-            padding: 5px 0;
-            color: #2c3e50;
+            font-size: 1.6em;
         }
         
         .error {
@@ -273,42 +225,33 @@
                 </div>
             </div>
             
-            <div class="form-group">
-                <button type="submit" id="searchButton" class="search-button">レシピを提案</button>
-            </div>
-        </form>
 
-        <div id="resultContainer" class="result-container" style="display: none;">
-            <div id="recipes"></div>
-            <div class="recipes">
-                <div class="recipe-day">
-                    <h3>買い物リスト</h3>
-                    <div class="recipe-type">
-                        <h4>食材一覧</h4>
+                <div id="resultContainer" class="result-container" style="display: none;">
+                    <div id="recipes"></div>
+                    <div class="shopping-list-container">
+                        <h3>買い物リスト</h3>
                         <div id="shoppingList"></div>
                     </div>
                 </div>
-            </div>
         </div>
-    </div>
 
-    <script>
-        // スライダーの初期化
-        document.querySelectorAll('.slider').forEach(slider => {
-            slider.addEventListener('input', function() {
-                const value = this.value;
-                const valueElement = document.getElementById(this.id + 'Value');
-                valueElement.textContent = value;
+        <script>
+            // スライダーの初期化
+            document.querySelectorAll('.slider').forEach(slider => {
+                slider.addEventListener('input', function() {
+                    const sliderValue = this.value;
+                    const valueElement = document.getElementById(this.id + 'Value');
+                    valueElement.textContent = sliderValue;
+                });
             });
-        });
 
-        // フォームの送信処理
-        document.getElementById('mealPlanForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const form = e.target;
-            const resultContainer = document.getElementById('resultContainer');
-            const recipes = document.getElementById('recipes');
-            const shoppingList = document.getElementById('shoppingList');
+            // フォームの送信処理
+            document.getElementById('mealPlanForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const form = e.target;
+                const resultContainer = document.getElementById('resultContainer');
+                const recipes = document.getElementById('recipes');
+                const shoppingList = document.getElementById('shoppingList');
 
             try {
                 // バリデーション
@@ -398,24 +341,34 @@
         }
 
         function formatRecipes(recipesText) {
-            try {
-                // バックエンドから既にHTMLが生成されているので、そのまま返す
-                console.log('Raw recipes text:', recipesText); // デバッグ用
-                
-                // 不要なタグを削除
-                const cleanedHtml = recipesText
-                    .replace(/<div class="recipes">/g, '')
-                    .replace(/<\/div>/g, '');
-                
-                // 最初と最後のタグを追加
-                const html = `<div class="recipes">${cleanedHtml}</div>`;
-                
-                console.log('Generated HTML:', html); // デバッグ用
-                return html;
-            } catch (error) {
-                console.error('Error in formatRecipes:', error);
-                return '<div class="error">レシピのフォーマットに失敗しました</div>';
+            const paragraphs = recipesText.split('\n');
+            let html = '';
+            let currentDay = null;
+
+            paragraphs.forEach((para, index) => {
+                if (!para.trim()) return;
+
+                // 日付の検出
+                const dayMatch = para.match(/^(\d+)日目$/);
+                if (dayMatch) {
+                    if (currentDay) {
+                        html += '</div>';
+                    }
+                    currentDay = dayMatch[1];
+                    html += `<div class="recipe-card">
+                                <h3>第${para}</h3>`;
+                    return;
+                }
+
+                // レシピの内容を直接表示
+                html += `<p>${para}</p>`;
+            });
+
+            if (currentDay) {
+                html += '</div>';
             }
+
+            return html;
         }
     </script>
 </body>
